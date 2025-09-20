@@ -99,22 +99,24 @@ def checkout(request):
         if request.user.is_authenticated:
             try:
                 profile = Profile.objects.get(user=request.user)
-                order_form = OrderForm(
-                    initial={
-                        "first_name": profile.default_first_name,
-                        "last_name": profile.default_last_name,
-                        "email": profile.default_email,
-                        "phone_number": profile.default_phone_number,
-                        "country": profile.default_country,
-                        "postcode": profile.default_postcode,
-                        "town_or_city": profile.default_town_or_city,
-                        "street_address1": profile.default_street_address1,
-                        "street_address2": profile.default_street_address2,
-                        "county": profile.default_county,
-                    }
-                )
+                order_form = OrderForm(initial={
+                    "first_name":  profile.default_first_name or request.user.first_name or "",
+                    "last_name":   profile.default_last_name  or request.user.last_name  or "",
+                    "email":       profile.default_email      or request.user.email      or "",
+                    "phone_number": profile.default_phone_number,
+                    "country":      profile.default_country,
+                    "postcode":     profile.default_postcode,
+                    "town_or_city": profile.default_town_or_city,
+                    "street_address1": profile.default_street_address1,
+                    "street_address2": profile.default_street_address2,
+                    "county":          profile.default_county,
+                })
             except Profile.DoesNotExist:
-                order_form = OrderForm()
+                order_form = OrderForm(initial={
+                    "first_name": request.user.first_name or "",
+                    "last_name":  request.user.last_name  or "",
+                    "email":      request.user.email      or "",
+                })
         else:
             order_form = OrderForm()
 

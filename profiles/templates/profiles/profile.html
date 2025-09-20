@@ -22,14 +22,14 @@
             <input type="hidden" name="form_type" value="profile_form">
             <!-- First Name -->
             <div class="space-y-2">
-                {{ profile_form.first_name.errors }}
-                {% render_field profile_form.first_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="First Name" %}
+                {{ profile_form.default_first_name.errors }}
+                {% render_field profile_form.default_first_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="First Name" %}
             </div>
 
             <!-- Last Name -->
             <div class="space-y-2">
-                {{ profile_form.last_name.errors }}
-                {% render_field profile_form.last_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Last Name" %}
+                {{ profile_form.default_last_name.errors }}
+                {% render_field profile_form.default_last_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Last Name" %}
             </div>
 
             <!-- Email Input -->

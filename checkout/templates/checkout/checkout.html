@@ -38,7 +38,7 @@
                     </div>
                     <!-- Email Input -->
                     <div class="space-y-2">
-                        {{order_form.full_name.errors}}
+                        {{ order_form.email.errors }}
                         {% render_field order_form.email class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Email Address *" %}
                     </div>
                 </fieldset>
@@ -52,12 +52,12 @@
                     </div>
                     <!-- Street Address 1 Input -->
                     <div class="space-y-2">
-                        {{order_form.street_address.errors}}
+                        {{order_form.street_address1.errors}}
                         {% render_field order_form.street_address1 class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Street Address 1 *" %}
                     </div>
                     <!-- Street Address 2 Input -->
                     <div class="space-y-2">
-                        {{order_form.street_address.errors}}
+                        {{order_form.street_address2.errors}}
                         {% render_field order_form.street_address2 class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Street Address 2" %}
                     </div>
                     <!-- Town or City Input -->

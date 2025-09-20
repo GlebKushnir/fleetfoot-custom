@@ -102,8 +102,12 @@ class StripeWebhookHandler:
         while attempt <= 5:
             try:
                 order = Order.objects.get(
-                    first_name__iexact=first_name,
-                    last_name__iexact=last_name,
+                    first_name__iexact=shipping_details.name.split(" ", 1)[0],
+                    last_name__iexact=(
+                        shipping_details.name.split(" ", 1)[1]
+                        if " " in shipping_details.name
+                        else ""
+                    ),
                     email__iexact=billing_details.email,
                     phone_number__iexact=shipping_details.phone,
                     country__iexact=shipping_details.address.country,
@@ -142,8 +146,8 @@ class StripeWebhookHandler:
             try:
                 # Разбиваем имя из Stripe (например: "Gleb Fuji") на части
                 parts = shipping_details.name.split(" ", 1) if shipping_details.name else ["", ""]
-                first_name = parts[0]
-                last_name = parts[1] if len(parts) > 1 else ""
+                first_name = shipping_details.name.split(" ", 1)[0]
+                last_name  = shipping_details.name.split(" ", 1)[1] if " " in shipping_details.name else ""
 
                 order = Order.objects.create(
                     user_profile=profile,
