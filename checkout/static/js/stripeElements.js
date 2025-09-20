@@ -68,6 +68,7 @@ form.addEventListener("submit", (event) => {
     csrfmiddlewaretoken: csrfToken,
     client_secret: paymentIntentClientSecret,
   };
+  const fullName = `${form.first_name?.value.trim() || ""} ${form.last_name?.value.trim() || ""}`;
 
   fetch(url, {
     method: "POST",
@@ -84,7 +85,7 @@ form.addEventListener("submit", (event) => {
           payment_method: {
             card: card,
             billing_details: {
-              name: form.full_name.value.trim(),
+              name: fullName,
               phone: form.phone_number.value.trim(),
               email: form.email.value.trim(),
               address: {
@@ -97,7 +98,7 @@ form.addEventListener("submit", (event) => {
             },
           },
           shipping: {
-            name: form.full_name.value.trim(),
+            name: fullName,
             phone: form.phone_number.value.trim(),
             address: {
               line1: form.street_address1.value.trim(),
@@ -113,8 +114,7 @@ form.addEventListener("submit", (event) => {
           // Handle payment intent response
           if (result.error) {
             const errorDiv = document.getElementById("card-errors");
-            const html = `
-            <span style="color: #f87171;">${result.error.message}</span>`;
+            const html = `<span style="color: #f87171;">${result.error.message}</span>`;
             errorDiv.innerHTML = html;
             card.update({ disabled: false });
             document.getElementById("loading-overlay").classList.add("hidden");

@@ -22,6 +22,8 @@
                 <h2 class="text-2xl font-bold text-center md:text-left ">Complete Your Order</h2>
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="checkout_form">
+                <input type="hidden" name="payment_intent_client_secret"
+                        value="{{ payment_intent_client_secret }}">
                 <fieldset class="space-y-4">
                     <legend>Details</legend>
                     <!-- Name Input -->
@@ -90,8 +92,6 @@
                     <!-- Card Payment Errors -->
                     <div id="card-errors" role="alert"></div>
                 </fieldset>
-
-                <input type="hidden" name="payment_intent_client_secret" value="{{ payment_intent_client_secret }}">
 
                 <!-- Form Buttons -->
                 <button id="submit-button" type="submit" class="text-white bg-black rounded-lg text-sm px-5 py-2.5 text-center hover:bg-gray-900 transition-colors ">Complete Order</button>
