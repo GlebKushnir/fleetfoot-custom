@@ -70,7 +70,16 @@ class StripeWebhookHandler:
         username = payment_intent.metadata.username
         if username != 'AnonymousUser':
             profile = Profile.objects.get(user__username=username)
-            profile.default_full_name = shipping_details.name
+
+            # Разбиваем shipping_details.name на имя + фамилию
+            first_name, last_name = "", ""
+            if shipping_details.name:
+                parts = shipping_details.name.split(" ", 1)
+                first_name = parts[0]
+                last_name = parts[1] if len(parts) > 1 else ""
+
+            profile.default_first_name = first_name
+            profile.default_last_name = last_name
             profile.default_email = billing_details.email
             profile.default_phone_number = shipping_details.phone
             profile.default_country = shipping_details.address.country
@@ -84,10 +93,17 @@ class StripeWebhookHandler:
         # Check if order already exists in the database
         order_exists = False
         attempt = 1
+
+        # Разделяем shipping_details.name на имя/фамилию
+        parts = shipping_details.name.split(" ", 1) if shipping_details.name else ["", ""]
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ""
+
         while attempt <= 5:
             try:
                 order = Order.objects.get(
-                    full_name__iexact=shipping_details.name,
+                    first_name__iexact=first_name,
+                    last_name__iexact=last_name,
                     email__iexact=billing_details.email,
                     phone_number__iexact=shipping_details.phone,
                     country__iexact=shipping_details.address.country,
@@ -117,16 +133,22 @@ class StripeWebhookHandler:
             self._send_confirmation_email(order)
 
             return HttpResponse(
-                content=f'Webhook received: {
-                    event["type"]} | SUCCESS: Verified order in database',
-                status=200)
+                content=f'Webhook received: {event["type"]} | SUCCESS: Verified order in database',
+                status=200,
+            )
         else:
             # If order does not exist in the database then create it
             order = None
             try:
+                # Разбиваем имя из Stripe (например: "Gleb Fuji") на части
+                parts = shipping_details.name.split(" ", 1) if shipping_details.name else ["", ""]
+                first_name = parts[0]
+                last_name = parts[1] if len(parts) > 1 else ""
+
                 order = Order.objects.create(
                     user_profile=profile,
-                    full_name=shipping_details.name,
+                    first_name=first_name,
+                    last_name=last_name,
                     email=billing_details.email,
                     phone_number=shipping_details.phone,
                     country=shipping_details.address.country,
@@ -138,6 +160,7 @@ class StripeWebhookHandler:
                     original_cart=cart,
                     stripe_pid=payment_intent_id,
                 )
+
                 for item in cart:
                     product = Product.objects.get(id=item['id'])
                     order_line_item = OrderLineItem(
@@ -151,7 +174,8 @@ class StripeWebhookHandler:
                     order.delete()
                 return HttpResponse(
                     content=f'Webhook received: {event["type"]} | ERROR: {e}',
-                    status=500)
+                    status=500
+                )
 
         # Decrement the quantity of stock from each product in the cart
         for item in cart:
@@ -167,9 +191,9 @@ class StripeWebhookHandler:
         self._send_confirmation_email(order)
 
         return HttpResponse(
-            content=f'Webhook received: {
-                event["type"]} | SUCCESS: Created order in webhook',
-            status=200)
+            content=f'Webhook received: {event["type"]} | SUCCESS: Created order in webhook',
+            status=200,
+        )
 
     def handle_payment_intent_payment_failed(self, event):
         """

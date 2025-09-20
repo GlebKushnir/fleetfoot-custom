@@ -25,9 +25,16 @@
                 <fieldset class="space-y-4">
                     <legend>Details</legend>
                     <!-- Name Input -->
+                    <!-- First Name Input -->
                     <div class="space-y-2">
-                        {{order_form.full_name.errors}}
-                        {% render_field order_form.full_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Full Name*" %}
+                        {{ order_form.first_name.errors }}
+                        {% render_field order_form.first_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="First Name *" %}
+                    </div>
+
+                    <!-- Last Name Input -->
+                    <div class="space-y-2">
+                        {{ order_form.last_name.errors }}
+                        {% render_field order_form.last_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Last Name *" %}
                     </div>
                     <!-- Email Input -->
                     <div class="space-y-2">

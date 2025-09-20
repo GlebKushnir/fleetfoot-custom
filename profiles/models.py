@@ -14,8 +14,10 @@ class Profile(models.Model):
     Represents a user profile.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    default_fullname = models.CharField(
-        max_length=100, null=True, blank=True)
+    default_first_name = models.CharField(
+        max_length=30, null=True, blank=True)
+    default_last_name = models.CharField(
+        max_length=30, null=True, blank=True)
     default_email = models.EmailField(
         max_length=100, null=True, blank=True)
     default_phone_number = models.CharField(

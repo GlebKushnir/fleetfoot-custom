@@ -20,10 +20,16 @@
             <h2 class="text-2xl font-bold text-center md:text-left">Delivery Information</h2>
             {% csrf_token %}
             <input type="hidden" name="form_type" value="profile_form">
-            <!-- Full Name Input -->
+            <!-- First Name -->
             <div class="space-y-2">
-                {{ profile_form.default_fullname.errors }}
-                {% render_field profile_form.default_fullname class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Full Name" %}
+                {{ profile_form.first_name.errors }}
+                {% render_field profile_form.first_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="First Name" %}
+            </div>
+
+            <!-- Last Name -->
+            <div class="space-y-2">
+                {{ profile_form.last_name.errors }}
+                {% render_field profile_form.last_name class="bg-gray-50 border border-gray-300 text-sm place rounded-lg block w-full p-2.5" placeholder="Last Name" %}
             </div>
 
             <!-- Email Input -->

@@ -189,3 +189,4 @@ STRIPE_CURRENCY = 'EUR'
 STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
 STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
 STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
