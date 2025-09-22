@@ -1,8 +1,10 @@
 {% extends "base.html" %}
+{% block title %}Fleetfoot | Checkout – Complete Your Order{% endblock %}
 
 {% load static %}
 {% load cart_tools %}
 {% load widget_tweaks %}
+{% load sku_extras %}
 
 {% block content %}
     <!-- Hero Section -->
@@ -101,23 +103,49 @@
             <div class="space-y-14 md:max-w-[400px] md:w-1/2 flex flex-col items-center">
                 <div class="space-y-12 sm:w-2/3 md:w-full">
                     <div class="space-y-2">
-                        <h3 class="text-2xl font-bold text-center md:text-left">In Your Cart</h3>
+                        <h3 class="text-2xl font-bold text-center md:text-left border-b border-gray-300 pb-2">In Your Cart</h3>
+
+                        <div class="flex justify-between">
+                            <span>Items</span>
+                            <span>{{ product_count }}</span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span>Original Price</span>
+                            <span>€{{ full_price|floatformat:2 }}</span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span>Discount</span>
+                            <span class="text-right text-red-600">—€{{ discount|floatformat:2 }}</span>
+                        </div>
+
                         <div class="flex justify-between">
                             <span>Subtotal</span>
-                            <span>€{{ total }}</span>
+                            <span>€{{ total|floatformat:2 }}</span>
                         </div>
+
+                        <div class="flex justify-between">
+                            <span>Tax (VAT)</span>
+                            <span>€0.00</span>
+                        </div>
+
                         {% if delivery > 0 %}
                             <div class="w-full py-1 text-center text-white bg-black">You only need to spend <strong>€{{free_delivery_delta}}</strong> more for <strong>free delivery!</strong></div>
                         {% endif %}
+                        
                         <div class="flex justify-between">
                             <span>Delivery</span>
                             <span>€{{ delivery|floatformat:2  }}</span>
                         </div>
+                        
                         <img src="{% static "images/horizontal-seperator.png" %}" alt="Horizontal separator">
+            
                         <div class="flex justify-between py-2 text-xl font-bold">
                             <span>Total</span>
                             <span>€{{ grand_total|floatformat:2 }}</span>
                         </div>
+                        
                         <img src="{% static "images/horizontal-seperator.png" %}" alt="Horizontal separator">
                     </div>
                 </div>
@@ -135,6 +163,13 @@
                             <div class="w-2/3">
                                 <h3 class="text-sm text-gray-500">{{ item.product.department.name }} {{ item.product.shoe_type.name }}</h3>
                                 <h2 class="text-nowrap">{{ item.product.name }}</h2>
+                                <p class="text-sm tracking-wide">SKU: {{ item.product.sku }}</p>
+                                <p class="text-sm tracking-wide">
+                                    Color:
+                                    <span class="inline-block w-4 h-4 ml-1 align-middle rounded-full ring-1 ring-gray-300"
+                                        style="background-color: {{ item.product.sku|sku_color }};"
+                                        data-color="{{ item.product.sku|sku_color }}"
+                                        title="Auto color from SKU"></span></p>
                                 <div class="flex gap-2">
                                     <p>Size: <strong>{{ item.size }}</strong></p>
                                     <p>Qty: <strong>{{ item.quantity }}</strong></p>

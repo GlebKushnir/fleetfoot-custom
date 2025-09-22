@@ -10,23 +10,32 @@ def cart(request):
     the total, delivery cost, and grand total.
     """
     cart_items = []
-    total = 0
+    total = 0 
+    full_price = 0
+    discount = 0
     product_count = 0
-    cart = request.session.get('cart', {})
+    cart = request.session.get("cart", {})
 
     for item in cart:
-        product_id = item['id']
+        product_id = item["id"]
         product = get_object_or_404(Product, pk=product_id)
-        size = item['size']
-        quantity = item['quantity']
+        size = item["size"]
+        quantity = item["quantity"]
+
+        full_price += quantity * product.list_price
+        discount += quantity * max(0, (product.list_price - product.current_price))
+
         total += quantity * product.current_price
         product_count += quantity
-        cart_items.append({
-            'item_id': product_id,
-            'product': product,
-            'size': size,
-            'quantity': quantity,
-        })
+
+        cart_items.append(
+            {
+                "item_id": product_id,
+                "product": product,
+                "size": size,
+                "quantity": quantity,
+            }
+        )
 
     if total < settings.FREE_DELIVERY_THRESHOLD:
         delivery = total * Decimal(settings.STANDARD_DELIVERY_PERCENTAGE / 100)
@@ -38,14 +47,17 @@ def cart(request):
     grand_total = delivery + total
 
     context = {
-        'cart_items': cart_items,
-        'total': total,
-        'unique_shoe_count': len(cart_items),
-        'product_count': product_count,
-        'delivery': delivery,
-        'free_delivery_delta': free_delivery_delta,
-        'free_delivery_threshold': settings.FREE_DELIVERY_THRESHOLD,
-        'grand_total': grand_total,
+        "cart_items": cart_items,
+        "total": total,
+        "full_price": full_price,
+        "discount": discount,
+        "unique_shoe_count": len(cart_items),
+        "product_count": product_count,
+        "delivery": delivery,
+        "free_delivery_delta": free_delivery_delta,
+        "free_delivery_threshold": settings.FREE_DELIVERY_THRESHOLD,
+        "grand_total": grand_total,
+        "tax": 0,
     }
 
     return context

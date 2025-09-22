@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% block title %}Fleetfoot | {{ product.name }} – Buy Online at Fleetfoot{% endblock %}
 
 {% load static %}
 {% load widget_tweaks %}
 {% load range_filter %}
+{% load humanize %}
+{% load sku_extras %}
 
 {% block content %}
     <div class="relative flex flex-col items-center justify-center min-h-screen px-10 py-24 mt-8 md:mt-24 lg:flex-row lg:gap-12 lg:mt-0">
@@ -11,6 +14,13 @@
             <div class="flex flex-col gap-2">
                 <h2 class="font-bold">{{ product.department.name }} {{ product.shoe_type.name }}</h2>
                 <h1 class="text-5xl font-bold max-w-[400px] mx-auto lg:mx-0">{{ product.name }}</h1>
+                <p class="text-xs text-gray-500 tracking-wide">SKU: {{ product.sku }}</p>
+                <p class="text-sm text-gray-500 tracking-wide">
+                    Color:
+                    <span class="inline-block w-4 h-4 ml-1 align-middle rounded-full ring-1 ring-gray-500"
+                            style="background-color: {{ product.sku|sku_color }};"
+                            data-color="{{ product.sku|sku_color }}"
+                            title="Auto color from SKU"></span></p>
             </div>
             <p class="text-sm text-gray-500 max-w-[400px] mx-auto lg:mx-0">{{ product.description }}</p>
 
@@ -40,16 +50,41 @@
         <div class="flex flex-col w-full gap-16 text-center lg:gap-10 lg:text-left lg:w-1/4">
             <div class="flex flex-col justify-between gap-10 lg:gap-6 md:flex-row md:max-w-[600px] mx-auto lg:flex-col lg:mx-0">
                 {% comment %} Product Rating {% endcomment %}
+                <h3 class="text-md font-bold text-[#df6a04] drop-shadow-md bg-gradient-to-r from-[#e5e7eb] to-transparent px-2 py-0.5 w-full rounded transition-colors duration-300 hover:from-[#d1d5db] !mb-0 !mt-0">
+                    Product Price
+                </h3>
+                <div class="product-price mt-0.5 leading-tight">
+                    {% if product.on_sale %}
+                        <div class="flex flex-col items-start gap-0.5">
+                        <span class="text-gray-500 line-through text-sm">
+                            {{ product.list_price|floatformat:2 }} €
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-3xl font-extrabold text-red-600 tracking-tight">
+                            {{ product.current_price|floatformat:2 }} €
+                            </span>
+                            <span class="px-1 py-0.3 text-sm font-bold text-white bg-purple-600 rounded">
+                            -{{ product.sale_percentage|floatformat:"0" }}%
+                            </span>
+                        </div>
+                        </div>
+                    {% else %}
+                        <span class="text-3xl font-extrabold text-black tracking-tight">
+                        {{ product.current_price|floatformat:2 }} €
+                        </span>
+                    {% endif %}
+                    </div>
+
                 <div class="flex flex-col items-center w-full gap-2 lg:items-start">
                     {% if average_rating %}
-                        <h2 class="font-bold">Avg Rating: {{average_rating}}</h2>
+                        Avg Rating: {{average_rating}}</h2>
                         <div class="flex gap-2">
                             {% for i in average_rating|times %}
                                 <img class="w-10" src="{% static "images/star-icon.svg" %}" alt="Filled Star">
                             {% endfor %}
                         </div>
                         {% else %}
-                        <h2 class="font-bold">Avg Rating: 0</h2>
+                        <h2 class="text-md font-bold text-blue-600 mb-0 drop-shadow-md bg-gradient-to-r from-[#e5e7eb] to-transparent px-2 py-0.5 w-full rounded transition-colors duration-300 hover:from-[#d1d5db]">Avg Rating: 0</h2>
                         <div class="flex gap-2">
                             <img width="40" height="40" class="w-10" src="{% static "images/star-outline-icon.svg" %}" alt="Empty star">
                             <img width="40" height="40" class="w-10" src="{% static "images/star-outline-icon.svg" %}" alt="Empty star">
@@ -62,7 +97,7 @@
 
                     {% comment %} Product Sizes {% endcomment %}
                 <div class="flex flex-col gap-4 max-w-[300px] mx-auto lg:mx-0">
-                    <h2 class="font-bold">Available Sizes</h2>
+                    <h2 class="text-md font-bold text-purple-600 mb-0 drop-shadow-md bg-gradient-to-r from-[#e5e7eb] to-transparent px-2 py-0.5 w-full rounded transition-colors duration-300 hover:from-[#d1d5db]">Available Sizes</h2>
                     <ul class="flex flex-wrap gap-3" aria-label="Available sizes">
                         {% if available_sizes %}
                             {% for size in available_sizes %}

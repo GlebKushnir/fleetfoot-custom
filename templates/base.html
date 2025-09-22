@@ -229,5 +229,18 @@
     <script src="{% static 'js/wishlist.js' %}"></script>
     <script src="{% static 'js/deleteConfirmation.js' %}"></script>
     {% block js_scripts %}{% endblock js_scripts %}
+
+<script>
+  document.querySelectorAll('.order-date').forEach(el => {
+    const utcDate = new Date(el.dataset.date); 
+    el.textContent = utcDate.toLocaleString([], { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+  });
+</script>
 </body>
 </html>

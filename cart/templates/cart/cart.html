@@ -1,7 +1,9 @@
 {% extends "base.html" %}
+{% block title %}Fleetfoot | Your Shopping Cart – Review Your Items{% endblock %}
 
 {% load static %}
 {% load cart_tools %}
+{% load sku_extras %}
 
 {% block content %}
     {% comment %} Hero Section {% endcomment %}
@@ -28,6 +30,13 @@
                         <div class="w-full lg:w-2/3">
                             <h3 class="text-sm text-gray-500">{{ item.product.department.name }} {{ item.product.shoe_type.name }}</h3>
                             <h2>{{ item.product.name }}</h2>
+                            <p class="text-sm tracking-wide">SKU: {{ item.product.sku }}</p>
+                            <p class="text-sm tracking-wide">
+                                Color:
+                                <span class="inline-block w-4 h-4 ml-1 align-middle rounded-full ring-1 ring-gray-500"
+                                    style="background-color: {{ item.product.sku|sku_color }};"
+                                    data-color="{{ item.product.sku|sku_color }}"
+                                    title="Auto color from SKU"></span></p>
                             <div class="flex gap-2">
                                 <p>Size: <strong>{{ item.size }}</strong></p>
                                 <p>Qty: <strong>{{ item.quantity }}</strong></p>
@@ -79,33 +88,55 @@
             </div>
 
             {% comment %} Cart Summary {% endcomment %}
-            <div class="w-full sm:w-2/3 max-w-[400px] space-y-2">
-                <h3 class="text-2xl font-bold">Summary</h3>
+            <div class="w-full sm:w-2/3 max-w-[400px] space-y-2 border rounded bg-gray-50 p-4 shadow-sm">
+                <h3 class="text-2xl font-bold border-b border-gray-300 pb-2">Summary</h3>
+
+                <div class="flex justify-between">
+                    <span>Items</span>
+                    <span>{{ product_count }}</span>
+                </div>
+
+                <div class="flex justify-between">
+                    <span>Original Price</span>
+                    <span>€{{ full_price|floatformat:2 }}</span>
+                </div>
+
+                <div class="flex justify-between">
+                    <span>Discount</span>
+                    <span class="text-right text-red-600">—€{{ discount|floatformat:2 }}</span>
+                </div>
+
                 <div class="flex justify-between">
                     <span>Subtotal</span>
-                    <span>€{{ total }}</span>
+                    <span>€{{ total|floatformat:2 }}</span>
                 </div>
-                {% if delivery > 0 %}
-                    <div class="w-full py-1 text-center text-white bg-black">You only need to spend <strong>€{{free_delivery_delta}}</strong> more for <strong>free delivery!</strong></div>
-                {% endif %}
+
+                <div class="flex justify-between">
+                    <span>Tax (VAT)</span>
+                    <span>€0.00</span>
+                </div>
+
                 <div class="flex justify-between">
                     <span>Delivery</span>
                     <span>€{{ delivery|floatformat:2 }}</span>
                 </div>
+
                 <img src="{% static "images/horizontal-seperator.png" %}" alt="Horizontal separator">
+
                 <div class="flex justify-between py-2 text-xl font-bold">
                     <span>Total</span>
                     <span>€{{ grand_total|floatformat:2 }}</span>
                 </div>
+
                 <img src="{% static "images/horizontal-seperator.png" %}" alt="Horizontal separator">
+
                 <div class="pt-6 space-y-4">
-                        <a class="block" href="{% url "checkout" %}">
-                            <button class="w-full py-3 font-bold text-white transition-colors bg-black rounded cursor-pointer hover:bg-gray-900">Checkout</button>
-                        </a>
-                        <a class="block" href="{% url "home" %}">
-                            <button class="w-full py-3 transition-colors border rounded cursor-pointer hover:bg-gray-100">Keep Shopping</button>
-                        </a>
-                    </div>
+                    <a class="block" href="{% url "checkout" %}">
+                        <button class="w-full py-3 font-bold text-white transition-colors bg-black rounded cursor-pointer hover:bg-gray-900">Checkout</button>
+                    </a>
+                    <a class="block" href="{% url "home" %}">
+                        <button class="w-full py-3 transition-colors border rounded cursor-pointer hover:bg-gray-100">Keep Shopping</button>
+                    </a>
                 </div>
             </div>
         {% else %}

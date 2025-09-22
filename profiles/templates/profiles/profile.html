@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Fleetfoot | My Profile – Orders & Saved Sneakers{% endblock %}
 
 {% load static %}
 {% load widget_tweaks %}
@@ -20,6 +21,12 @@
             <h2 class="text-2xl font-bold text-center md:text-left">Delivery Information</h2>
             {% csrf_token %}
             <input type="hidden" name="form_type" value="profile_form">
+            
+            <!-- Username (hardcoded display only) -->
+            <div class="mb-4 flex items-center gap-2">
+                <span class="text-lg text-gray-500">Username:</span>
+                <span class="font-bold text-lg text-red-600 ">{{ user.username }}</span>
+            </div>
             <!-- First Name -->
             <div class="space-y-2">
                 {{ profile_form.default_first_name.errors }}
@@ -92,7 +99,8 @@
                             </div>
                             <div>
                                 <h3 class="mb-2 font-bold">Date</h3>
-                                <span class="text-sm">{{ order.date }}</span>
+                                {% comment %} <span class="text-sm">{{ order.date }}</span> {% endcomment %}
+                                <span class="text-sm order-date" data-date="{{ order.date|date:'c' }}"></span>
                             </div>
                             <div class="relative">
                                 <h3 class="mb-2 font-bold">Items</h3>

@@ -3,7 +3,7 @@ Hello {{ order.first_name }} {{ order.last_name }}!
 This is a confirmation of your order from Fleetfoot. Your order information is below:
 
 Order Number: {{ order.order_number }}
-Order Date: {{ order.date }}
+Order Date: {{ order.date|date:'c' }}
 
 Order Total: ${{ order.order_total }}
 Delivery: ${{ order.delivery_cost }}

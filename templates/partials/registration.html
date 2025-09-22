@@ -25,16 +25,17 @@
                 <div class="block text-sm font-medium">
                     {{ form.password1.label_tag }}
                 </div>
-                {{form.password1.errors}}
-                {% render_field form.password1 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="●●●●●●●●" %}
+                {{ form.password1.errors }}
+                {% render_field form.password1 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="Password" %}
+                <p class="text-xs text-gray-500 text-gray-600">Password must be at least 6 characters long.</p>
             </div>
             <!-- Repeat Password Input -->
             <div class="space-y-2">
                 <div class="block text-sm font-medium">
                     {{ form.password2.label_tag }}
                 </div>
-                {{form.password2.errors}}
-                {% render_field form.password2 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="●●●●●●●●" %}
+                {{ form.password2.errors }}
+                {% render_field form.password2 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" placeholder="Confirm password" %}
             </div>
             <!-- Submit Button -->
             <div class="py-5">
