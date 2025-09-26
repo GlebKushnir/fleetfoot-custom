@@ -4,6 +4,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--dataLayer-->
+<script>
+  window.dataLayer = window.dataLayer || [];
+</script>
+    <!-- End dataLayer-->
+
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M549VFNZ');</script>
+<!-- End Google Tag Manager -->
+
      <!-- Meta -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -26,7 +40,21 @@
     {% tailwind_css %}
     <title>{% block title %}Fleetfoot{% endblock title %}</title>
 </head>
-<body>
+<body 
+  data-page-key="{% block page_key %}{% endblock %}"
+  data-user-status="{% if request.user.is_authenticated %}logged_in{% else %}guest{% endif %}"
+  {% if request.user.is_authenticated %} data-user-id="{{ request.user.id }}" {% endif %}>
+  
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M549VFNZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+ 
+<script src="{% static 'gtm/events.js' %}"></script>
+<script src="{% static 'gtm/helpers.js' %}"></script>
+<div id="cart-meta" data-session="{{ request.session.session_key }}"></div>
+
+
     <!-- Messages -->
     {% if messages %}
         <div class="fixed z-50 overflow-hidden border rounded shadow-lg top-6 right-6">
@@ -62,7 +90,7 @@
                         <img width="30" height="50" class="h-6" src="{% static "images/menu-seperator.svg" %}" alt="Menu separator icon">
                     </li>
                     <li class="pr-3">
-                        <a href="{% url 'products-list' 'kids' %}" class="text-sm font-base">Kids</a>
+                        <a href="{% url 'products-list' 'kids' %}" class="text-sm font-base">Kids'</a>
                     </li>
                 </ul>
             </nav>

@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.utils.safestring import mark_safe
+from decimal import Decimal
 
 from products.models import Product
 from home.forms import RegistrationForm, LoginForm
@@ -9,27 +10,52 @@ from utils import handle_login, handle_registration
 
 def view_cart(request):
     """A view for rendering the cart contents."""
-    # Authentication
     login_form = LoginForm()
     registration_form = RegistrationForm()
 
-    if request.method == 'POST':
-        form_type = request.POST['form_type']
+    if request.method == "POST":
+        form_type = request.POST["form_type"]
 
-        # Handle User Login
         if form_type == "login_form":
             if handle_login(request):
-                return redirect('home')
-
-        # Handle User Registration
-        elif form_type == 'registration_form':
+                return redirect("home")
+        elif form_type == "registration_form":
             if handle_registration(request):
-                return redirect('home')
+                return redirect("home")
 
-    return render(request, 'cart/cart.html', {
-        'login_form': login_form,
-        'registration_form': registration_form,
-    })
+    cart = request.session.get("cart", [])
+    full_price = Decimal('0')
+    subtotal = (
+        sum(
+            [
+                item.get("quantity", 0)
+                * Product.objects.get(pk=item["id"]).current_price
+                for item in cart
+            ]
+        )
+        if cart
+        else 0
+    )
+    discount = 0  # если у тебя своя логика скидок, сюда можно подтянуть
+    delivery = 0  # пока пусть будет 0
+
+    tax = subtotal * Decimal("0.05")
+    grand_total = subtotal - discount + delivery + tax
+
+    return render(
+        request,
+        "cart/cart.html",
+        {
+            "login_form": login_form,
+            "registration_form": registration_form,
+            "total": subtotal,
+            "discount": discount,
+            "delivery": delivery,
+            "tax": tax,
+            "grand_total": grand_total,
+            "product_count": sum([item.get("quantity", 0) for item in cart]),
+        },
+    )
 
 
 def add_to_cart(request, product_id):

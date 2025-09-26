@@ -19,7 +19,7 @@
     "model": "products.department",
     "pk": 3,
     "fields": {
-      "name": "Kids",
+      "name": "Kids'",
       "friendly_url_name": "kids"
     }
   }

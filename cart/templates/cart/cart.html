@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% block page_key %}shopping_cart{% endblock %}
+
 {% block title %}Fleetfoot | Your Shopping Cart – Review Your Items{% endblock %}
 
 {% load static %}
@@ -113,7 +115,7 @@
 
                 <div class="flex justify-between">
                     <span>Tax (VAT)</span>
-                    <span>€0.00</span>
+                    <span>€{{ tax|floatformat:2 }}</span>
                 </div>
 
                 <div class="flex justify-between">

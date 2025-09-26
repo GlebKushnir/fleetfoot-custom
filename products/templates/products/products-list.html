@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% block page_key %}products_list{% endblock %}
+{% block category %}mens{% endblock %}
 {% block title %}Fleetfoot | {{ department|title }} {{ shoe_type.name|default:"Shoes" }} – Buy Online at Fleetfoot{% endblock %}
 
 {% load static %}
@@ -16,7 +18,16 @@
 
     <div class="mt-4 space-y-8">
         {% comment %} Products Section {% endcomment %}
-        <h2 class="px-2 pt-6 text-3xl font-black text-center">{{ department|title }} {{ shoe_type.name|default:"Shoes" }}</h2>
+        <h2 class="px-2 pt-6 text-3xl font-black text-center">
+            {% if department|lower == "mens" %}Men's
+            {% elif department|lower == "womens" %}Women's
+            {% elif department|lower == "kids" %}Kids'
+            {% else %}{{ department|title }}{% endif %}
+            
+            {% if shoe_type.name|default:"All" == "All" %} Shoes
+            {% else %} {{ shoe_type.name }}
+            {% endif %}
+            </h2>
 
         {% comment %} Shoe Type Menu {% endcomment %}
         <ul class="flex px-6 justify-center gap-4 flex-wrap items-center max-w-[650px] mx-auto">

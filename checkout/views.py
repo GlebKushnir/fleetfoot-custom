@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+from decimal import Decimal
 import json
 
 from cart.context_processors import cart as cart_contents
@@ -43,80 +44,115 @@ def checkout(request):
     stripe_public_key = settings.STRIPE_PUBLIC_KEY
     stripe_secret_key = settings.STRIPE_SECRET_KEY
 
-    cart = request.session.get('cart', {})
+    cart = request.session.get("cart", {})
 
-    if request.method == 'POST':
-        form_type = request.POST['form_type']
+    if request.method == "POST":
+        form_type = request.POST["form_type"]
         if form_type == "checkout_form":
-
             order_form = OrderForm(request.POST)
 
             if order_form.is_valid():
                 order = order_form.save(commit=False)
                 payment_intent_id = request.POST.get(
-                    'payment_intent_client_secret').split('_secret')[0]
+                    "payment_intent_client_secret"
+                ).split("_secret")[0]
                 order.stripe_pid = payment_intent_id
                 order.original_cart = json.dumps(cart)
                 order.save()
                 for item in cart:
                     try:
-                        product = Product.objects.get(id=item['id'])
+                        product = Product.objects.get(id=item["id"])
                         order_line_item = OrderLineItem(
                             order=order,
                             product=product,
-                            quantity=item['quantity'],
+                            quantity=item["quantity"],
                         )
                         order_line_item.save()
                     except Product.DoesNotExist:
-                        messages.error(request, (
-                            "One of the products in your cart wasn't found \
-                              in our database.")
+                        messages.error(
+                            request,
+                            (
+                                "One of the products in your cart wasn't found in our database."
+                            ),
                         )
                         order.delete()
-                        return redirect(reverse('view-cart'))
+                        return redirect(reverse("view-cart"))
 
-                return redirect(reverse('checkout-success',
-                                        args=[order.order_number]))
+                return redirect(reverse("checkout-success", args=[order.order_number]))
             else:
-                messages.error(request, 'There was an error with your form. \
-                    Please double check your information.')
+                messages.error(
+                    request,
+                    "There was an error with your form. \
+                    Please double check your information.",
+                )
     else:
         if not cart:
-            messages.error(
-                request, "There's nothing in your cart at the moment.")
-            return redirect(reverse('home'))
+            messages.error(request, "There's nothing in your cart at the moment.")
+            return redirect(reverse("home"))
+
+        cart_items = []
+        full_price = Decimal("0")
+        subtotal = Decimal("0")
+        product_count = 0
+
+        for item in cart:
+            product = Product.objects.get(pk=item["id"])
+            quantity = item.get("quantity", 1)
+            product_count += quantity
+
+            full_price += product.list_price * quantity
+            subtotal += product.current_price * quantity
+
+            cart_items.append(
+                {
+                    "item_id": product.id,
+                    "product": product,
+                    "size": item["size"],
+                    "quantity": quantity,
+                }
+            )
+
+        discount = full_price - subtotal
+        delivery = Decimal("0")
+        tax = subtotal * Decimal("0.05")  # 5% VAT
+        grand_total = subtotal + delivery + tax
 
         # Setup and create the stripe payment intent
-        current_cart = cart_contents(request)
-        total = current_cart['grand_total']
-        stripe_total = round(total * 100)
+        stripe_total = round(grand_total * 100)
         stripe.api_key = stripe_secret_key
         payment_intent = stripe.PaymentIntent.create(
-            amount=stripe_total,
-            currency=settings.STRIPE_CURRENCY
+            amount=stripe_total, currency=settings.STRIPE_CURRENCY
         )
 
         if request.user.is_authenticated:
             try:
                 profile = Profile.objects.get(user=request.user)
-                order_form = OrderForm(initial={
-                    "first_name":  profile.default_first_name or request.user.first_name or "",
-                    "last_name":   profile.default_last_name  or request.user.last_name  or "",
-                    "email":       profile.default_email      or request.user.email      or "",
-                    "phone_number": profile.default_phone_number,
-                    "country":      profile.default_country,
-                    "postcode":     profile.default_postcode,
-                    "town_or_city": profile.default_town_or_city,
-                    "street_address1": profile.default_street_address1,
-                    "street_address2": profile.default_street_address2,
-                    "county":          profile.default_county,
-                })
+                order_form = OrderForm(
+                    initial={
+                        "first_name": profile.default_first_name
+                        or request.user.first_name
+                        or "",
+                        "last_name": profile.default_last_name
+                        or request.user.last_name
+                        or "",
+                        "email": profile.default_email or request.user.email or "",
+                        "phone_number": profile.default_phone_number,
+                        "country": profile.default_country,
+                        "postcode": profile.default_postcode,
+                        "town_or_city": profile.default_town_or_city,
+                        "street_address1": profile.default_street_address1,
+                        "street_address2": profile.default_street_address2,
+                        "county": profile.default_county,
+                    }
+                )
             except Profile.DoesNotExist:
-                order_form = OrderForm(initial={
-                    "first_name": request.user.first_name or "",
-                    "last_name":  request.user.last_name  or "",
-                    "email":      request.user.email      or "",
-                })
+                order_form = OrderForm(
+                    initial={
+                        "first_name": request.user.first_name or "",
+                        "last_name": request.user.last_name or "",
+                        "email": request.user.email or "",
+                    }
+                )
         else:
             order_form = OrderForm()
 
@@ -124,26 +160,38 @@ def checkout(request):
     login_form = LoginForm()
     registration_form = RegistrationForm()
 
-    if request.method == 'POST':
-        form_type = request.POST['form_type']
+    if request.method == "POST":
+        form_type = request.POST["form_type"]
 
         # Handle User Login
         if form_type == "login_form":
             if handle_login(request):
-                return redirect('checkout')
+                return redirect("checkout")
 
         # Handle User Registration
-        elif form_type == 'registration_form':
+        elif form_type == "registration_form":
             if handle_registration(request):
-                return redirect('checkout')
+                return redirect("checkout")
 
-    return render(request, 'checkout/checkout.html', {
-        'login_form': login_form,
-        'registration_form': registration_form,
-        'order_form': order_form,
-        'stripe_public_key': stripe_public_key,
-        'payment_intent_client_secret': payment_intent.client_secret,
-    })
+    return render(
+        request,
+        "checkout/checkout.html",
+        {
+            "login_form": login_form,
+            "registration_form": registration_form,
+            "order_form": order_form,
+            "stripe_public_key": stripe_public_key,
+            "payment_intent_client_secret": payment_intent.client_secret,
+            "cart_items": cart_items,
+            "product_count": product_count,
+            "full_price": full_price,
+            "discount": discount,
+            "total": subtotal,
+            "delivery": delivery,
+            "tax": tax,
+            "grand_total": grand_total,
+        },
+    )
 
 
 def checkout_success(request, order_number):

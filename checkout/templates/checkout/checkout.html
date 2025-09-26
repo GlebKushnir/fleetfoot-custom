@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block page_key %}order_checkout{% endblock %}
 {% block title %}Fleetfoot | Checkout – Complete Your Order{% endblock %}
 
 {% load static %}
@@ -127,7 +128,7 @@
 
                         <div class="flex justify-between">
                             <span>Tax (VAT)</span>
-                            <span>€0.00</span>
+                            <span>€{{ tax|floatformat:2 }}</span>
                         </div>
 
                         {% if delivery > 0 %}
@@ -156,7 +157,7 @@
                     {% for item in cart_items %}
                         <!-- Cart Item -->
                         <div class="flex flex-col items-center md:gap-10 lg:flex-row">
-                            <a class="block w-2/3"  href="{% url "product-detail" item.item_id %}">
+                            <a class="block w-2/3" href="{% url 'product-detail' item.product.id %}">
                                 <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }} image">
                             </a>
                             <!-- Product Info -->

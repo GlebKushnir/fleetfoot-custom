@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block page_key %}product_detail{% endblock %}
 {% block title %}Fleetfoot | {{ product.name }} – Buy Online at Fleetfoot{% endblock %}
 
 {% load static %}
@@ -12,7 +13,18 @@
         {% comment %} Product Info {% endcomment %}
         <div class="flex flex-col gap-6 text-center lg:gap-10 lg:text-left lg:w-1/4">
             <div class="flex flex-col gap-2">
-                <h2 class="font-bold">{{ product.department.name }} {{ product.shoe_type.name }}</h2>
+                <h2 class="font-bold">
+                    {% if product.department.name|lower == "mens" %}Men's
+                    {% elif product.department.name|lower == "womens" %}Women's
+                    {% elif product.department.name|lower == "kids" %}Kids'
+                    {% else %}{{ product.department.name|title }}{% endif %}
+
+                    {% if product.shoe_type.name|default:"All" == "All" %}
+                        Shoes
+                    {% else %}
+                        {{ product.shoe_type.name }}
+                    {% endif %}
+                    </h2>
                 <h1 class="text-5xl font-bold max-w-[400px] mx-auto lg:mx-0">{{ product.name }}</h1>
                 <p class="text-xs text-gray-500 tracking-wide">SKU: {{ product.sku }}</p>
                 <p class="text-sm text-gray-500 tracking-wide">
